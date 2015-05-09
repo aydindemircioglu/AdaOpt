@@ -35,5 +35,18 @@
 #	devtools::check()
 # R CMD check ./SVMBridge_1.0.tar.gz
 
-	AdaSVRG()
+	
+	X = as.matrix(iris[,1:4])
+	Y = as.matrix(as.numeric(iris[,5]))
+	AdaSVRGOpt(X, Y)
+	
+	AdaSGDOpt( X, Y)
+	AdaSDCAOpt( X, Y)
+	AdaSDCAPlusOpt( X, Y)
+	NonUnifSGDOpt( X, Y)
+	NonUnifSDCAOpt( X, Y)
+	AdaGradOpt( X, Y)
+	AdaSVRGOpt( X, Y)
+
+	
 	

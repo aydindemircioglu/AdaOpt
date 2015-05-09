@@ -7,33 +7,216 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// [[Rcpp::export]]
-List AdaSVRG() {
 
-	double lambda = 0.0001;
-	uint epoch = 30;
-	uint num_rounds = 10;
+
+
+
+// [[Rcpp::export]]
+List AdaSGDOpt( NumericMatrix X, NumericVector Y,
+			  double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
 	
+	// TODO: can this be done more efficient?
 	std::vector<simple_sparse_vector> Dataset;
 	std::vector<int> Labels;
-	uint dimension = 0;
+	
+	uint dimension = Dataset.size();
+	
 	
 	std::vector<simple_sparse_vector> testDataset;
 	std::vector<int> testLabels;
-
+	
 	std::vector<double> p;
-
+	
+	// ??? global?? , VarianceReduction
+	
 	Model mod;
-	//mod.ReadData(data_filename, Dataset, Labels, dimension, readingTime);
-	
-	
-	// global?? , VarianceReduction
-	
-	Rcout << "AdaSVRG:\n";
-	mod.SGDLearn(Dataset, Labels, dimension, testDataset, testLabels,
-				 lambda, p, VarianceReduction, 0, num_rounds, epoch, 1);
+	mod.SGDLearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, Adaptive, 0, num_rounds, epoch, 1);
 	
 	List z            = List::create() ;
 	return z ;
 }
+
+
+
+// [[Rcpp::export]]
+List AdaSDCAOpt( NumericMatrix X, NumericVector Y,
+			 double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
+	
+	// TODO: can this be done more efficient?
+	std::vector<simple_sparse_vector> Dataset;
+	std::vector<int> Labels;
+	
+	uint dimension = Dataset.size();
+	
+	
+	std::vector<simple_sparse_vector> testDataset;
+	std::vector<int> testLabels;
+	
+	std::vector<double> p;
+	
+	// ??? global?? , VarianceReduction
+	
+	Model mod;
+	mod.SDCALearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, Adaptive2, num_rounds, epoch, 1);
+	
+	List z            = List::create() ;
+	return z ;
+}
+
+			 
+
+
+// [[Rcpp::export]]
+List AdaSDCAPlusOpt( NumericMatrix X, NumericVector Y,
+			 double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
+	
+	// TODO: can this be done more efficient?
+	std::vector<simple_sparse_vector> Dataset;
+	std::vector<int> Labels;
+	
+	uint dimension = Dataset.size();
+	
+	
+	std::vector<simple_sparse_vector> testDataset;
+	std::vector<int> testLabels;
+	
+	std::vector<double> p;
+	
+	// ??? global?? , VarianceReduction
+	
+	Model mod;
+	mod.SDCALearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, AdaSDCAp, num_rounds, epoch, 1);
+	
+	List z            = List::create() ;
+	return z ;
+}
+
+
+
+
+// [[Rcpp::export]]
+List NonUnifSGDOpt( NumericMatrix X, NumericVector Y,
+			  double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
+	
+	// TODO: can this be done more efficient?
+	std::vector<simple_sparse_vector> Dataset;
+	std::vector<int> Labels;
+	
+	uint dimension = Dataset.size();
+	
+	
+	std::vector<simple_sparse_vector> testDataset;
+	std::vector<int> testLabels;
+	
+	std::vector<double> p;
+	
+	// ??? global?? , VarianceReduction
+	
+	Model mod;
+	mod.SGDLearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, Plain, 0, num_rounds, epoch, 1);
+	
+	List z            = List::create() ;
+	return z ;
+}
+
+
+
+// [[Rcpp::export]]
+List NonUnifSDCAOpt( NumericMatrix X, NumericVector Y,
+			  double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
+	
+	// TODO: can this be done more efficient?
+	std::vector<simple_sparse_vector> Dataset;
+	std::vector<int> Labels;
+	
+	uint dimension = Dataset.size();
+	
+	
+	std::vector<simple_sparse_vector> testDataset;
+	std::vector<int> testLabels;
+	
+	std::vector<double> p;
+	
+	// ??? global?? , VarianceReduction
+	
+	Model mod;
+	mod.SDCALearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, Plain, num_rounds, epoch, 1);
+	
+	List z            = List::create() ;
+	return z ;
+}
+			  
+
+
+// [[Rcpp::export]]
+List AdaGradOpt( NumericMatrix X, NumericVector Y,
+			 double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
+	
+	// TODO: can this be done more efficient?
+	std::vector<simple_sparse_vector> Dataset;
+	std::vector<int> Labels;
+	
+	uint dimension = Dataset.size();
+	
+	
+	std::vector<simple_sparse_vector> testDataset;
+	std::vector<int> testLabels;
+	
+	std::vector<double> p;
+	
+	// ??? global?? , VarianceReduction
+	
+	Model mod;
+	mod.SGDLearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, AdaGrad, 0, num_rounds, epoch, 1);
+	
+	List z            = List::create() ;
+	return z ;
+}
+
+
+
+// [[Rcpp::export]]
+List AdaSVRGOpt( NumericMatrix X, NumericVector Y,
+			  double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
+	
+	// TODO: can this be done more efficient?
+	std::vector<simple_sparse_vector> Dataset;
+	std::vector<int> Labels;
+	
+	for (size_t i = 0; i < X.nrow(); i++) {
+		// find non-null rows and create a string from it
+		// 		std::istringstream is;
+		// 		simple_sparse_vector instance(is, n);
+		// 		Dataset.push_back(instance);
+		// 		num_examples++;
+	}
+	
+	// TODO: this can be done in one line, yes.
+	for (size_t i = 0; i < Y.size(); i++) {
+		Labels.push_back(Y[i]);
+	}
+	
+	
+	uint dimension = Dataset.size();
+	
+	
+	
+	
+	std::vector<simple_sparse_vector> testDataset;
+	std::vector<int> testLabels;
+	
+	std::vector<double> p;
+	
+	// ??? global?? , VarianceReduction
+	
+	Model mod;
+	mod.SGDLearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, VarianceReduction, 0, num_rounds, epoch, 1);
+	
+	List z            = List::create() ;
+	return z ;
+}
+			  
+			  
+			  
+
 
