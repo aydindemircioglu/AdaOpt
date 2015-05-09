@@ -1,0 +1,9 @@
+PKG_CXXFLAGS=-I. 
+PKG_LIBS=$(shell $(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()")  -Lraynald.chung  -lraynald 
+
+$(SHLIB): raynald.chung/libraynald.a
+
+raynald.chung/libraynald.a:
+	@(cd raynald.chung && $(MAKE) libraynald.a \
+	  CC="$(CC)" CFLAGS="$(CFLAGS) $(CPICFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)")
+	  
