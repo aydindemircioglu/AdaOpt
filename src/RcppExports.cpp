@@ -66,8 +66,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // NonUnifSDCAOpt
-List NonUnifSDCAOpt(NumericMatrix X, NumericVector Y, double lambda, uint epoch, uint num_rounds);
-RcppExport SEXP AdaOpt_NonUnifSDCAOpt(SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP epochSEXP, SEXP num_roundsSEXP) {
+List NonUnifSDCAOpt(NumericMatrix X, NumericVector Y, double lambda, uint epoch);
+RcppExport SEXP AdaOpt_NonUnifSDCAOpt(SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP epochSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -75,14 +75,27 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type Y(YSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< uint >::type epoch(epochSEXP);
-    Rcpp::traits::input_parameter< uint >::type num_rounds(num_roundsSEXP);
-    __result = Rcpp::wrap(NonUnifSDCAOpt(X, Y, lambda, epoch, num_rounds));
+    __result = Rcpp::wrap(NonUnifSDCAOpt(X, Y, lambda, epoch));
     return __result;
 END_RCPP
 }
 // AdaGradOpt
-List AdaGradOpt(NumericMatrix X, NumericVector Y, double lambda, uint epoch, uint num_rounds);
-RcppExport SEXP AdaOpt_AdaGradOpt(SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP epochSEXP, SEXP num_roundsSEXP) {
+List AdaGradOpt(NumericMatrix X, NumericVector Y, double lambda, uint epoch);
+RcppExport SEXP AdaOpt_AdaGradOpt(SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP epochSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< uint >::type epoch(epochSEXP);
+    __result = Rcpp::wrap(AdaGradOpt(X, Y, lambda, epoch));
+    return __result;
+END_RCPP
+}
+// AdaSGDTest
+List AdaSGDTest(NumericMatrix X, NumericVector Y, double lambda, uint epoch, uint num_rounds);
+RcppExport SEXP AdaOpt_AdaSGDTest(SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP epochSEXP, SEXP num_roundsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -91,7 +104,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< uint >::type epoch(epochSEXP);
     Rcpp::traits::input_parameter< uint >::type num_rounds(num_roundsSEXP);
-    __result = Rcpp::wrap(AdaGradOpt(X, Y, lambda, epoch, num_rounds));
+    __result = Rcpp::wrap(AdaSGDTest(X, Y, lambda, epoch, num_rounds));
     return __result;
 END_RCPP
 }

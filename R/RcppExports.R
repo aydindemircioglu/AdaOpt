@@ -17,12 +17,16 @@ NonUnifSGDOpt <- function(X, Y, lambda = 0.0001, epoch = 30L, num_rounds = 10L) 
     .Call('AdaOpt_NonUnifSGDOpt', PACKAGE = 'AdaOpt', X, Y, lambda, epoch, num_rounds)
 }
 
-NonUnifSDCAOpt <- function(X, Y, lambda = 0.0001, epoch = 30L, num_rounds = 10L) {
-    .Call('AdaOpt_NonUnifSDCAOpt', PACKAGE = 'AdaOpt', X, Y, lambda, epoch, num_rounds)
+NonUnifSDCAOpt <- function(X, Y, lambda = 0.0001, epoch = 30L) {
+    .Call('AdaOpt_NonUnifSDCAOpt', PACKAGE = 'AdaOpt', X, Y, lambda, epoch)
 }
 
-AdaGradOpt <- function(X, Y, lambda = 0.0001, epoch = 30L, num_rounds = 10L) {
-    .Call('AdaOpt_AdaGradOpt', PACKAGE = 'AdaOpt', X, Y, lambda, epoch, num_rounds)
+AdaGradOpt <- function(X, Y, lambda = 0.0001, epoch = 30L) {
+    .Call('AdaOpt_AdaGradOpt', PACKAGE = 'AdaOpt', X, Y, lambda, epoch)
+}
+
+AdaSGDTest <- function(X, Y, lambda = 0.0001, epoch = 30L, num_rounds = 10L) {
+    .Call('AdaOpt_AdaSGDTest', PACKAGE = 'AdaOpt', X, Y, lambda, epoch, num_rounds)
 }
 
 AdaSVRGOpt <- function(X, Y, lambda = 0.0001, epoch = 30L, num_rounds = 10L) {

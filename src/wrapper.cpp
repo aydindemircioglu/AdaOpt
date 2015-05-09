@@ -30,7 +30,7 @@ List AdaSGDOpt( NumericMatrix X, NumericVector Y,
 	// ??? global?? , VarianceReduction
 	
 	Model mod;
-	mod.SGDLearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, Adaptive, 0, num_rounds, epoch, 1);
+	mod.SGDLearn (Dataset, Labels, dimension, lambda, p, Adaptive, 0, epoch, 1);
 	
 	List z            = List::create() ;
 	return z ;
@@ -113,7 +113,7 @@ List NonUnifSGDOpt( NumericMatrix X, NumericVector Y,
 	// ??? global?? , VarianceReduction
 	
 	Model mod;
-	mod.SGDLearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, Plain, 0, num_rounds, epoch, 1);
+	mod.SGDLearn (Dataset, Labels, dimension, lambda, p, Plain, 0, epoch, 1);
 	
 	List z            = List::create() ;
 	return z ;
@@ -123,7 +123,7 @@ List NonUnifSGDOpt( NumericMatrix X, NumericVector Y,
 
 // [[Rcpp::export]]
 List NonUnifSDCAOpt( NumericMatrix X, NumericVector Y,
-			  double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
+			  double lambda = 0.0001, uint epoch = 30) {
 	
 	// TODO: can this be done more efficient?
 	std::vector<simple_sparse_vector> Dataset;
@@ -140,7 +140,7 @@ List NonUnifSDCAOpt( NumericMatrix X, NumericVector Y,
 	// ??? global?? , VarianceReduction
 	
 	Model mod;
-	mod.SDCALearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, Plain, num_rounds, epoch, 1);
+	mod.SDCALearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, Plain, 0, epoch, 1);
 	
 	List z            = List::create() ;
 	return z ;
@@ -150,7 +150,7 @@ List NonUnifSDCAOpt( NumericMatrix X, NumericVector Y,
 
 // [[Rcpp::export]]
 List AdaGradOpt( NumericMatrix X, NumericVector Y,
-			 double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
+			 double lambda = 0.0001, uint epoch = 30) {
 	
 	// TODO: can this be done more efficient?
 	std::vector<simple_sparse_vector> Dataset;
@@ -167,11 +167,42 @@ List AdaGradOpt( NumericMatrix X, NumericVector Y,
 	// ??? global?? , VarianceReduction
 	
 	Model mod;
-	mod.SGDLearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, AdaGrad, 0, num_rounds, epoch, 1);
+	mod.SGDLearn (Dataset, Labels, dimension, lambda, p, AdaGrad, 0, epoch, 1);
 	
 	List z            = List::create() ;
 	return z ;
 }
+
+
+
+// [[Rcpp::export]]
+List AdaSGDTest( NumericMatrix X, NumericVector Y,
+				 double lambda = 0.0001, uint epoch = 30, uint num_rounds = 10) {
+	
+	// TODO: can this be done more efficient?
+	std::vector<simple_sparse_vector> Dataset;
+	std::vector<int> Labels;
+	
+	uint dimension = Dataset.size();
+	
+	
+	std::vector<simple_sparse_vector> testDataset;
+	std::vector<int> testLabels;
+	
+	std::vector<double> p;
+	
+	// ??? global?? , VarianceReduction
+	
+	Model mod; 
+	WeightVector W(dimension);
+	mod.SGDTest (W, Dataset, Labels);
+	
+	List z            = List::create() ;
+	return z ;
+				 }
+				 
+				 
+				 
 
 
 
@@ -210,7 +241,7 @@ List AdaSVRGOpt( NumericMatrix X, NumericVector Y,
 	// ??? global?? , VarianceReduction
 	
 	Model mod;
-	mod.SGDLearn (Dataset, Labels, dimension, testDataset, testLabels, lambda, p, VarianceReduction, 0, num_rounds, epoch, 1);
+	mod.SGDLearn (Dataset, Labels, dimension, lambda, p, VarianceReduction, 0, epoch, 1);
 	
 	List z            = List::create() ;
 	return z ;
