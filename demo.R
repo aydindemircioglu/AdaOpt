@@ -38,15 +38,14 @@
 	
 	X = as.matrix(iris[,1:4])
 	Y = as.matrix(as.numeric(iris[,5]))
-	AdaSVRGOpt(X, Y)
+	AdaOpt(method = "AdaSVRG", X, Y)
+	AdaOpt(method = "AdaSDCA", X, Y)
+	AdaOpt(method = "AdaSDCAPlus", X, Y)
+	AdaOpt(method = "AdaGrad", X, Y)
+	AdaOpt(method = "AdaSGD", X, Y)
+	AdaOpt(method = "NonUnifSDCA", X, Y)
+	AdaOpt(method = "NonUnifSGD", X, Y)
 	
-	AdaSGDOpt( X, Y)
-	AdaSDCAOpt( X, Y)
-	AdaSDCAPlusOpt( X, Y)
-	NonUnifSGDOpt( X, Y)
-	NonUnifSDCAOpt( X, Y)
-	AdaGradOpt( X, Y)
-	AdaSVRGOpt( X, Y)
 
 	
 	

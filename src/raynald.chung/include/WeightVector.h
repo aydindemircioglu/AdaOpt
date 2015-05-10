@@ -27,8 +27,9 @@
 
 class WeightVector {
   
- private:
-    WeightVector(const WeightVector&);// disallowed
+public:
+	// FIXME FIXME FIXME!
+	WeightVector(const WeightVector&) { std::cout << "FIXME!!!\n";};// disallowed
   
  public:
 

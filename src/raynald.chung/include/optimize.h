@@ -69,7 +69,7 @@ class Model {
  public:
 
      // Main optimization function for SGD
-     void SGDLearn(
+	 WeightVector SGDLearn(
              // Input variables
              std::vector<simple_sparse_vector> Dataset,
              std::vector<int> Labels,
@@ -90,18 +90,17 @@ class Model {
 	 
 	 
      // Main optimization function for SDCA
-     void SDCALearn(
+	 WeightVector SDCALearn(
              // Input variables
              std::vector<simple_sparse_vector> Dataset,
              std::vector<int> Labels,
              uint dimension,
-             std::vector<simple_sparse_vector> testDataset,
-             std::vector<int> testLabels,
              double lambda,
              std::vector<double> p,
              Alg algo,
              // Additional parameters
-             const uint &num_round, const uint &num_epoch, const uint &k);
+             //const uint &num_round, 
+			 const uint &num_epoch, const uint &k);
     
      // Print result
      void Print();

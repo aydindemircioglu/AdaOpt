@@ -12,6 +12,8 @@ double GetRuntime(void) {
     return static_cast<double>(start)/static_cast<double>(CLOCKS_PER_SEC);
 }
 
+
+
 // Function for getting an index of a sample point according to p
 uint GetSample(const std::vector<double> &p) {
     double rand_num = rand() * p[0] / RAND_MAX;
@@ -24,6 +26,8 @@ uint GetSample(const std::vector<double> &p) {
     }
     return p.size()-2;
 }
+
+
 
 // Binary Search for getting an index of a sample point according to p
 uint BinaryGetSample(const std::vector<double> &s) {
@@ -46,7 +50,7 @@ uint BinaryGetSample(const std::vector<double> &s) {
 
 
 // SGD main algorithm
-void Model::SGDLearn(
+WeightVector Model::SGDLearn(
         // Input variables
         std::vector<simple_sparse_vector> Dataset,
         std::vector<int> Labels,
@@ -291,9 +295,12 @@ void Model::SGDLearn(
 			output[epoch].total_time += epoch_end_time - epoch_start_time;
 		}
 	}
+	return (W);
 }
 
 
+
+// same for SDCA
 void Model::SGDTest (
 	WeightVector &W,
 	std::vector<simple_sparse_vector> testDataset,
@@ -318,24 +325,26 @@ void Model::SGDTest (
 	// return this
 	std::cout << test_loss;
 	std::cout << test_error;
-	
+
+// FIXME	
 }
 
 
 
-void Model::SDCALearn(
+WeightVector Model::SDCALearn(
         // Input variables
         std::vector<simple_sparse_vector> Dataset,
         std::vector<int> Labels,
         uint dimension,
-        std::vector<simple_sparse_vector> testDataset,
-        std::vector<int> testLabels,
-        double lambda,
+
+		double lambda,
         std::vector<double> p, 
         Alg algo,
         // Additional parameters
-        const uint &num_round, const uint &num_epoch, const uint &k ) {
-    uint num_examples = Labels.size();
+        //const uint &num_round, 
+		const uint &num_epoch, const uint &k ) {
+    
+	uint num_examples = Labels.size();
 
     double t;
     std::vector<double> prob;
@@ -353,26 +362,18 @@ void Model::SDCALearn(
         out->loss_value = 0;
         out->zero_one_error = 0;
         out->obj_value = 0;
-        out->test_loss = 0;
-        out->test_error = 0;
     }
 
     // ---------------- Main Loop -------------------
-    for (uint round = 1; round <= num_round; round++) {
+//    for (uint round = 1; round <= num_round; round++) 
+	{
         W.scale(0);
         std::fill(alpha.begin(), alpha.end(), 0);
         prob = p;
         t = 0;
 
-        for (uint epoch = 0; epoch < num_epoch; epoch++) {
-            
-            // * print out probability
-            /*
-            for (uint i = 1; i <= num_examples; ++i) {
-                std::cout << 1.0 * prob[i] / prob[0] << " \n"[i == num_examples];
-            }
-            */
-
+        for (uint epoch = 0; epoch < num_epoch; epoch++) 
+		{
             sum.clear();
             sum.push_back(0);
             for (uint i = 1; i <= num_examples; ++i) {
@@ -497,28 +498,12 @@ void Model::SDCALearn(
             double calc_obj_endTime = GetRuntime();
             double calc_obj_time = calc_obj_endTime - calc_obj_startTime;
 
-            // Calculate test_loss and test_error
-            double test_loss = 0.0;
-            double test_error = 0.0;
-            for (uint i = 0; i < testDataset.size(); ++i) {
-                double cur_loss = 1 - testLabels[i] * (W * testDataset[i]);
-                if (cur_loss < 0.0) cur_loss = 0.0;
-                test_loss += cur_loss;
-                if (cur_loss >= 1.0) test_error += 1.0;
-            }
-            if (testDataset.size() != 0) {
-                test_loss /= testDataset.size();
-                test_error /= testDataset.size();
-            }
-            
             output[epoch].train_time += train_time;
             output[epoch].calc_obj_time += calc_obj_time;
             output[epoch].norm_value += norm_value;
             output[epoch].loss_value += loss_value;
             output[epoch].zero_one_error += zero_one_error;
             output[epoch].obj_value += obj_value;
-            output[epoch].test_loss += test_loss;
-            output[epoch].test_error += test_error;
 
             if (algo == Adaptive) {
                 /*
@@ -576,20 +561,14 @@ void Model::SDCALearn(
             output[epoch].total_time += epoch_end_time - epoch_start_time;
         }
     }
-    for (std::vector<ResultStruct>::iterator out = output.begin(); out != output.end(); out++ ) { 
-        out->total_time /= num_round;
-        out->train_time /= num_round;
-        out->calc_obj_time /= num_round;
-        out->norm_value /= num_round;
-        out->loss_value /= num_round;
-        out->zero_one_error /= num_round;
-        out->obj_value /= num_round;
-        out->test_loss /= num_round;
-        out->test_error /= num_round;
-    }
+    
+    
     // W.print(std::cout);
     Print();
+	return (W);
 }
+
+
 
 void Model::Print() {
     std::cout << "Total_time:\t";
@@ -655,6 +634,8 @@ void Model::Print() {
     std::cout << std::endl;
     std::cout << std::endl;
 }
+
+
 
 // ---------------- READING DATA ------------------------------//
 void Model::ReadData(
