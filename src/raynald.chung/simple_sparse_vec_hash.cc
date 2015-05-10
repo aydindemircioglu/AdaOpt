@@ -27,7 +27,7 @@ simple_sparse_vector::simple_sparse_vector(std::istream& is) : my_vec() {
     is >> key;
     double val;
     is >> val;
-    val = 1;
+//    val = 1; ??
 
     // insert to the map
     my_vec.push_back(IndexValuePair(key,val));
@@ -49,7 +49,7 @@ simple_sparse_vector::simple_sparse_vector(std::istringstream& is,int n) : my_ve
     is >> key;
     double val;
     is >> val;
-    val = 1;
+//    val = 1; ?
 
     // insert to the map
     my_vec.push_back(IndexValuePair(key,val));

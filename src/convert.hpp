@@ -23,11 +23,12 @@ void convertData (NumericMatrix X, NumericVector Y,
 		int n = 0;
 		for (size_t j = 0; j < X.ncol(); j++) {
 			if (X(i,j) != 0) {
-				tmp << j << " " << X(i,j) << " ";
+				tmp << j + 1<< " " << X(i,j) << " ";
 				n++;
 			}
 		}
-		
+		 
+//		Rcout << tmp.str() << "\n";
 		std::istringstream is (tmp.str());
 		simple_sparse_vector instance(is, n);
 		Dataset.push_back(instance);
@@ -36,6 +37,11 @@ void convertData (NumericMatrix X, NumericVector Y,
 	// TODO: this can be done in one line, yes.
 	for (size_t i = 0; i < Y.size(); i++) {
 		Labels.push_back(Y[i]);
+	}
+
+	if (Y.size() != X.nrow()) {
+		Rcout << "Data has " << X.nrow() << " points, label have " << Y.size() << " points.\n";
+		stop ("Dimensions of data and labels do not match!");
 	}
 	
 	dimension = X.ncol();

@@ -58,22 +58,37 @@ List AdaOpt (std::string method,
 	NumericMatrix X, 
 	NumericVector Y,
 	double lambda = 0.0001, 
-	uint epochs = 30) 
+	uint epochs = 30,
+	bool verbose = false) 
 {
+	// check method first before converting Dataset
+	if ((method != "AdaSVRG") && (method != "AdaSGD") && (method != "AdaSDCA") && 
+		(method != "AdaSDCAPlus") && 	(method != "NonUnifSGD") && 	(method != "NonUnifSDCA") && 
+		(method != "AdaGrad")) {
+		Rf_error ("Unknown method");
+	}
 	
-	 // TODO: check method first before converting Dataset
-	
+	if (verbose == true) {
+		Rcout << "AdaOpt: Loading data\n";
+	}
+
 	// convert R to internal format
 	std::vector<simple_sparse_vector> Dataset;
 	std::vector<int> Labels;
 	uint dimension = 0;
 	convertData (X, Y, Dataset, Labels, dimension);
 
+/*	
+	for (int i = 0; i < Dataset.size(); i++) {
+		Rcout << Y(i) << " ";
+		Dataset[i].print(Rcout);
+	}
+*/
+	
 	// init probablity 
 	std::vector<double> p;
 	initializeP (p, Dataset, Labels, lambda);
 
-	bool verbose = false;
 	if (verbose == true) {
 		std::cout << "Num examples = " << Labels.size() << std::endl;
 		std::cout << "Num epochs = " << epochs << std::endl;

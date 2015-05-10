@@ -38,6 +38,9 @@
 	
 	X = as.matrix(iris[,1:4])
 	Y = as.matrix(as.numeric(iris[,5]))
+	Y[Y==2]=-1
+	Y[Y==3]=-1
+
 	AdaOpt(method = "AdaSVRG", X, Y)
 	AdaOpt(method = "AdaSDCA", X, Y)
 	AdaOpt(method = "AdaSDCAPlus", X, Y)
@@ -46,6 +49,8 @@
 	AdaOpt(method = "NonUnifSDCA", X, Y)
 	AdaOpt(method = "NonUnifSGD", X, Y)
 	
+	print("OK, Computer")
+	AdaOpt(method = "Unknown", X, Y)
 
 	
 	

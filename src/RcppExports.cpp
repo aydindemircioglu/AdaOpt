@@ -6,8 +6,8 @@
 using namespace Rcpp;
 
 // AdaOpt
-List AdaOpt(std::string method, NumericMatrix X, NumericVector Y, double lambda, uint epochs);
-RcppExport SEXP AdaOpt_AdaOpt(SEXP methodSEXP, SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP epochsSEXP) {
+List AdaOpt(std::string method, NumericMatrix X, NumericVector Y, double lambda, uint epochs, bool verbose);
+RcppExport SEXP AdaOpt_AdaOpt(SEXP methodSEXP, SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP epochsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -16,7 +16,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type Y(YSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< uint >::type epochs(epochsSEXP);
-    __result = Rcpp::wrap(AdaOpt(method, X, Y, lambda, epochs));
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    __result = Rcpp::wrap(AdaOpt(method, X, Y, lambda, epochs, verbose));
     return __result;
 END_RCPP
 }
