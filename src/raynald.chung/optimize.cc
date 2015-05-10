@@ -80,6 +80,12 @@ ResultStruct &Model::SGDLearn(
     WeightVector eval_W(dimension);
     WeightVector G(dimension);
 
+	chiv.resize(num_examples);
+	alpha.resize(num_examples);
+	precompute.resize(num_examples);
+	count.resize(num_examples);
+	
+	
     output.resize(num_epoch);
     for (std::vector<ResultStruct>::iterator out = output.begin(); out != output.end(); out++ ) { 
         out->total_time = 0;
@@ -93,218 +99,248 @@ ResultStruct &Model::SGDLearn(
         out->test_error = 0;
     }
 
-    {
-        W.scale(0);
-        G.scale(0);
-        prob = p;
-        t = 0;
+	W.scale(0);
+	G.scale(0);
+	prob = p;
+	t = 0;
 
-        for (uint epoch = 0; epoch < num_epoch; epoch++) {
- 
-			if (verbose == true) {
-				std::cout << "Epoch: " << epoch << "\n";
-			}
-			
-			// 0.2 | 0.3 |0.5
-			// -> 0 | 0.2 | 0.5 | 1.0
-            sum.clear();
-            sum.push_back(0);
-			for (uint i = 0; i < num_examples; ++i) {
-				sum.push_back(sum[i]+prob[i]);
-			}
-            
-           if (algo == Adaptive || algo == Adaptive2) {
-                std::fill(chiv.begin(), chiv.end(), 0);
-                std::fill(count.begin(), count.end(), 0);
-            }
-            if (algo == VarianceReduction && epoch > 0) {
-                rW = W;
-                C.scale(0);
-                for (uint i = 0; i < num_examples; ++i) {
-                    precompute[i] = W * Dataset[i];
-                    double loss = std::max(0.0, 1.0 - Labels[i] * precompute[i]);
-                    if (loss > 0.0) {
-                        C.add(Dataset[i], -Labels[i]);
-                    }
-                }
-                C.scale(1.0 / num_examples);
-                C.add(W, lambda);
-            }
-
-            double epoch_start_time = GetRuntime();
-            double train_startTime = GetRuntime();
-            double sample_time = 0;
- 
-            // learning rate
-            double eta;
-            double prediction;
-            double cur_loss;
-
-            for (uint i = 0; i < num_examples; ++i) {
-                ++t;
-
-                if (eta_rule_type == 0) {
-                    eta = 1.0 / (lambda * t); 
-                } else {
-                    eta = 2.0 / (lambda * (t+1));
-                }
-                
-                if(algo == AdaGrad) eta = 1.0;
-                //if(algo == VarianceReduction) eta = 1.0;
-
-                // choose random example
-                double sample_start = GetRuntime();
-                //uint r = GetSample(prob);
-                uint r = BinaryGetSample(sum);
-                sample_time += GetRuntime() - sample_start;
-
-                // calculate prediction
-                prediction = W * Dataset[r];
-
-                // calculate loss
-                cur_loss = std::max(0.0, 1.0 - Labels[r] * prediction);
-
-                if (algo == Online) {
-                    double temp = W.snorm() * lambda * lambda;
-                    if(cur_loss > 0.0) {
-                        temp += Dataset[r].snorm() * Labels[r] * Labels[r] - prediction * Labels[r] * lambda * 2.0;
-                    }
-                    temp = std::max(sqrt(temp), prob[0] / num_examples / 100);
-                    //if(recent[r].size()==1) 
-                    //recent[r].pop_front();
-                    //recent[r].push_back(temp);
-                    double peek = temp;
-                    //for(std::deque<double>::iterator ele = recent[r].begin(); ele!=recent[r].end();ele++) 
-                    //    if (*ele > peek) peek = *ele;
-                    prob[0] += peek - prob[r + 1];
-                    prob[r + 1] = peek; 
-                } else {
-                    if ((algo == Adaptive || algo == Adaptive2) && num_examples - i <= k) {
-                        double pred;
-                        double loss;
-                        double temp;
-
-                        for (uint j = 0; j < num_examples; ++j) {
-                            pred = W * Dataset[j];
-                            loss = std::max(0.0, 1.0 - Labels[j] * pred);
-                            temp = W.snorm() * lambda * lambda;
-                            if (loss > 0.0) {
-                                temp = temp + Dataset[j].snorm() * Labels[j] * Labels[j] - pred * Labels[j] * lambda * 2.0;
-                                ++ count[j];
-                            }
-                            temp = sqrt(temp);
-                            if (temp > chiv[j]) chiv[j] = temp;
-                        }
-                    }
-                }
-                if (algo == VarianceReduction && epoch > 0) {
-                    old_W = W;
-                    old_W.scale(lambda);
-                    if (cur_loss > 0.0) {
-                        old_W.add(Dataset[r], -Labels[r]);
-                    }
-                    old_W2 = rW;
-                    old_W2.scale(lambda);
-                    double loss = std::max(0.0, 1.0 - Labels[r] * precompute[r]);
-                    if (loss > 0.0) {
-                        old_W2.add(Dataset[r], -Labels[r]);
-                    }
-                    old_W.add(old_W2, -1);
-                    old_W.add(C, num_examples * prob[r + 1] / prob[0]);
-                    W.add(old_W, -eta / (num_examples * prob[r + 1] / prob[0]));
-                } else {
-                    if (algo == AdaGrad) {
-                        old_W = W;
-                        old_W.scale(lambda);
-                        if (cur_loss > 0.0) 
-                            old_W.add(Dataset[r], -Labels[r]);
-                        old_W.scale(1 / (num_examples * prob[r + 1] / prob[0]));
-                        G.sqr_add(old_W);
-                        old_W.pair_mul(G);
-                        W.add(old_W, -eta);
-                    } else {
-                        W.scale(1.0 - lambda * eta / (num_examples * prob[r + 1] / prob[0]));
-                        if(cur_loss > 0.0) {
-                            W.add(Dataset[r], Labels[r] * eta / (num_examples * prob[r + 1] / prob[0]));
-                        }
-                    }
-                }
-                if (eta_rule_type == 1) {
-                    weight_W.add(W, t);
-                }
-            }
-
-            // update timeline
-            double train_endTime = GetRuntime() - sample_time;
-            double train_time = train_endTime - train_startTime;
-            double calc_obj_startTime = GetRuntime();
-
-            if (eta_rule_type == 1) {
-                eval_W = W;
-                W = weight_W;
-                W.scale(2.0/t/(t+1));
-            }
-            // Calculate objective value
-            double norm_value = W.snorm();
-            double obj_value = norm_value * lambda / 2.0;
-            double loss_value = 0.0;
-            double zero_one_error = 0.0;
-            for (uint i=0; i < Dataset.size(); ++i) {
-                double cur_loss = 1 - Labels[i] * (W * Dataset[i]);
-                if (cur_loss < 0.0) cur_loss = 0.0;
-                loss_value += cur_loss / num_examples;
-                obj_value += cur_loss / num_examples;
-                if (cur_loss >= 1.0) zero_one_error += 1.0/num_examples;
-            }
-
-            double calc_obj_endTime = GetRuntime();
-            double calc_obj_time = calc_obj_endTime - calc_obj_startTime;
-			
-			output[epoch].train_time += train_time;
-			output[epoch].calc_obj_time += calc_obj_time;
-			output[epoch].norm_value += norm_value;
-			output[epoch].loss_value += loss_value;
-			output[epoch].zero_one_error += zero_one_error;
-			output[epoch].obj_value += obj_value;
-			
-			if (algo == Adaptive) {
-				double sumup = 0;
-				double comeup = 0;
-				for (uint j = 0; j < num_examples; ++j) {
-					if (count[j] > 0) {
-						if (prob[j + 1] / prob[0]  < 0.1 / num_examples) {
-							prob[j + 1] = p[j + 1];
-						} else {
-							prob[j + 1] = chiv[j];
-						}
-					} else {
-						prob[j + 1] = -1; 
-					}
-					chiv[j] = 0;
-					count[j] = 0;
-				}
-				for (uint j = 1; j <= num_examples; ++j) {
-					if(prob[j]>0) sumup += prob[j]; else comeup ++;
-				}
-				for (uint j = 1; j <= num_examples; ++j) {
-					if(prob[j]>0) prob[j] /= (sumup+comeup); else prob[j] = 1.0 / (sumup+comeup); 
-				}
-				prob[0] = 1;
-			}
-			else if (algo == Adaptive2) {
-				prob[0] = 0;
-				for (uint j = 0; j < num_examples; ++j) {
-					prob[j + 1] = chiv[j];
-					chiv[j] = 0;
-					count[j] = 0;
-					prob[0] += prob[j + 1];
-				}
-			}
-			double epoch_end_time= GetRuntime();
-			output[epoch].total_time += epoch_end_time - epoch_start_time;
+	for (uint epoch = 0; epoch < num_epoch; epoch++) {
+	
+		verbose = true;
+		if (verbose == true) {
+			std::cout << "Epoch: " << epoch << "\n";
 		}
+		
+		// 0.2 | 0.3 |0.5
+		// -> 0 | 0.2 | 0.5 | 1.0
+		sum.clear();
+		sum.push_back(0);
+		for (uint i = 0; i < num_examples; ++i) {
+			sum.push_back(sum[i]+prob[i]);
+		}
+		std::cout << "V\n";
+		
+		if (algo == Adaptive || algo == Adaptive2) {
+			std::fill(chiv.begin(), chiv.end(), 0);
+			std::fill(count.begin(), count.end(), 0);
+		}
+
+		std::cout << "G\n";
+		if (algo == VarianceReduction && epoch > 0) {
+			rW = W;
+			C.scale(0);
+			std::cout << "A\n";
+			for (uint i = 0; i < num_examples; ++i) {
+				precompute[i] = W * Dataset[i];
+				double loss = std::max(0.0, 1.0 - Labels[i] * precompute[i]);
+				if (loss > 0.0) {
+					C.add(Dataset[i], -Labels[i]);
+				}
+			}
+			std::cout << "L\n";
+			C.scale(1.0 / num_examples);
+			C.add(W, lambda);
+		}
+		std::cout << "F\n";
+		
+		double epoch_start_time = GetRuntime();
+		double train_startTime = GetRuntime();
+		double sample_time = 0;
+
+		// learning rate
+		double eta;
+		double prediction;
+		double cur_loss;
+
+		for (uint i = 0; i < num_examples; ++i) {
+			std::cout << "K\n";
+			
+			++t;
+
+			if (eta_rule_type == 0) {
+				eta = 1.0 / (lambda * t); 
+			} else {
+				eta = 2.0 / (lambda * (t+1));
+			}	
+			
+			if(algo == AdaGrad) eta = 1.0;
+			//if(algo == VarianceReduction) eta = 1.0;
+
+			// choose random example
+			double sample_start = GetRuntime();
+			//uint r = GetSample(prob);
+			uint r = BinaryGetSample(sum);
+			sample_time += GetRuntime() - sample_start;
+
+			// calculate prediction
+			prediction = W * Dataset[r];
+			
+			// calculate loss
+			cur_loss = std::max(0.0, 1.0 - Labels[r] * prediction);
+
+			if (algo == Online) {
+				double temp = W.snorm() * lambda * lambda;
+				if(cur_loss > 0.0) {
+					temp += Dataset[r].snorm() * Labels[r] * Labels[r] - prediction * Labels[r] * lambda * 2.0;
+				}
+				temp = std::max(sqrt(temp), prob[0] / num_examples / 100);
+				//if(recent[r].size()==1) 
+				//recent[r].pop_front();
+				//recent[r].push_back(temp);
+				double peek = temp;
+				//for(std::deque<double>::iterator ele = recent[r].begin(); ele!=recent[r].end();ele++) 
+				//    if (*ele > peek) peek = *ele;
+				prob[0] += peek - prob[r + 1];
+				prob[r + 1] = peek; 
+			} else {
+				if ((algo == Adaptive || algo == Adaptive2) && num_examples - i <= k) {
+					double pred;
+					double loss;
+					double temp;
+
+					for (uint j = 0; j < num_examples; ++j) {
+						pred = W * Dataset[j];
+						loss = std::max(0.0, 1.0 - Labels[j] * pred);
+						temp = W.snorm() * lambda * lambda;
+						if (loss > 0.0) {
+							temp = temp + Dataset[j].snorm() * Labels[j] * Labels[j] - pred * Labels[j] * lambda * 2.0;
+							++ count[j];
+						}
+						temp = sqrt(temp);
+						if (temp > chiv[j]) chiv[j] = temp;
+					}
+				}
+			}
+			
+			if (algo == VarianceReduction && epoch > 0) {
+				old_W = W;
+				old_W.scale(lambda);
+				if (cur_loss > 0.0) {
+					old_W.add(Dataset[r], -Labels[r]);
+				}
+				old_W2 = rW;
+				old_W2.scale(lambda);
+				double loss = std::max(0.0, 1.0 - Labels[r] * precompute[r]);
+				if (loss > 0.0) {
+					old_W2.add(Dataset[r], -Labels[r]);
+				}
+				old_W.add(old_W2, -1);
+				old_W.add(C, num_examples * prob[r + 1] / prob[0]);
+				W.add(old_W, -eta / (num_examples * prob[r + 1] / prob[0]));
+			} else {
+				if (algo == AdaGrad) {
+					old_W = W;
+					old_W.scale(lambda);
+					if (cur_loss > 0.0) 
+						old_W.add(Dataset[r], -Labels[r]);
+					old_W.scale(1 / (num_examples * prob[r + 1] / prob[0]));
+					G.sqr_add(old_W);
+					old_W.pair_mul(G);
+					W.add(old_W, -eta);
+				} else {
+					W.scale(1.0 - lambda * eta / (num_examples * prob[r + 1] / prob[0]));
+					if(cur_loss > 0.0) {
+						W.add(Dataset[r], Labels[r] * eta / (num_examples * prob[r + 1] / prob[0]));
+					}
+				}
+			}
+			if (eta_rule_type == 1) {
+				weight_W.add(W, t);
+			}
+		}
+		std::cout << "W\n";
+		
+		// update timeline
+		double train_endTime = GetRuntime() - sample_time;
+		double train_time = train_endTime - train_startTime;
+		double calc_obj_startTime = GetRuntime();
+
+		if (eta_rule_type == 1) {
+			eval_W = W;
+			W = weight_W;
+			W.scale(2.0/t/(t+1));
+		}
+		// Calculate objective value
+		double norm_value = W.snorm();
+		double obj_value = norm_value * lambda / 2.0;
+		double loss_value = 0.0;
+		double zero_one_error = 0.0;
+
+		for (uint i=0; i < Dataset.size(); ++i) {
+			double cur_loss = 1 - Labels[i] * (W * Dataset[i]);
+			if (cur_loss < 0.0) cur_loss = 0.0;
+			loss_value += cur_loss / num_examples;
+			obj_value += cur_loss / num_examples;
+			if (cur_loss >= 1.0) zero_one_error += 1.0/num_examples;
+		}
+
+		double calc_obj_endTime = GetRuntime();
+		double calc_obj_time = calc_obj_endTime - calc_obj_startTime;
+		
+		output[epoch].train_time += train_time;
+		output[epoch].calc_obj_time += calc_obj_time;
+		output[epoch].norm_value += norm_value;
+		output[epoch].loss_value += loss_value;
+		output[epoch].zero_one_error += zero_one_error;
+		output[epoch].obj_value += obj_value;
+		std::cout << "2Y\n";
+		
+		if (algo == Adaptive) {
+			std::cout << "U\n";
+			double sumup = 0;
+			double comeup = 0;
+			for (uint j = 0; j < num_examples-1; ++j) {
+				if (count[j] > 0) {
+					if (prob[j + 1] / prob[0]  < 0.1 / num_examples) {
+						prob[j + 1] = p[j + 1];
+					} else {
+						prob[j + 1] = chiv[j];
+					}
+				} else {
+					prob[j + 1] = -1; 
+				}
+				chiv[j] = 0;
+				count[j] = 0;
+			}
+			
+			for (uint j = 0; j < num_examples; ++j) {
+				std::cout << "Y2\n";
+				if (prob[j]>0) {
+					sumup += prob[j]; 
+				} else { 
+					comeup ++;
+				}
+			}
+
+			std::cout << "U\n";
+			for (uint j = 0; j < num_examples; ++j) {
+				if (prob[j]>0) {
+					prob[j] /= (sumup+comeup); 
+				} else { 
+					prob[j] = 1.0 / (sumup+comeup); 
+				}
+			}
+			prob[0] = 1;
+		}
+		else if (algo == Adaptive2) {
+			std::cout << "M\n";
+			prob[0] = 0;
+			for (uint j = 0; j < num_examples-1; ++j) {
+				prob[j + 1] = chiv[j];
+				chiv[j] = 0;
+				count[j] = 0;
+				prob[0] += prob[j + 1];
+			}
+		}
+		std::cout << "T\n";
+		double epoch_end_time= GetRuntime();
+		output[epoch].total_time += epoch_end_time - epoch_start_time;
+		std::cout << "Q\n";
 	}
+	std::cout << "X\n";
 	ResultStruct R;
+	R.W = W;
+	std::cout << "X\n";
 	return (R);
 }
 

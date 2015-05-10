@@ -1,5 +1,3 @@
-
-
 #include "raynald.chung/include/cmd_line.h"
 #include "raynald.chung/include/simple_sparse_vec_hash.h"
 #include "raynald.chung/include/optimize.h"
@@ -49,12 +47,16 @@ void convertData (NumericMatrix X, NumericVector Y,
 			  
 			  
 			  
-void convertWeightVector (WeightVector W, NumericVector intW) {
+void convertWeightVector (WeightVector W, NumericVector &intW) {
+	std::cout << "W -> intW\n";
+	intW = NumericVector ::create();
 }
 
 
 
-void convertWeightVector (NumericVector intW, WeightVector W) {
+void convertWeightVector (NumericVector intW, WeightVector &W) {
+	std::cout << "intW -> W\n";
+	W = WeightVector(5);
 }
 
 
