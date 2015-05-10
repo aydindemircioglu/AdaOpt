@@ -10,7 +10,46 @@
 using namespace Rcpp;
 
 
+
+
 // TODO: some kind of train object instead of just a weight?
+
+
+// calculate all the p_i
+void initializeP (std::vector<double> &p, 	
+	std::vector<simple_sparse_vector> Dataset,
+	std::vector<int> Labels,
+	double lambda)
+{
+	p.clear();
+	double sumup = 0;
+	double average = 0;
+	double variance = 0;
+	uint num_examples = Labels.size();
+
+	// for adaptive sampling
+	p.push_back(1);
+	for (uint i = 1; i <= num_examples; ++i) {
+		p.push_back(sqrt(Dataset[i].snorm()) + sqrt(lambda));
+		sumup += p[i];
+	}
+	
+	average = sumup / num_examples;
+	for (uint i = 0; i < num_examples; ++i) {
+		variance += (average - p[i]) * (average - p[i]);
+	}
+	variance = variance / num_examples;
+
+	bool verbose = false;
+	if (verbose == true) {
+		std::cout << "Norm average = " << average << std::endl;
+		std::cout << "Norm variance = " << variance << std::endl;
+	}
+
+	for (uint i = 1; i <= num_examples; ++i) {
+		p[i] /= sumup;
+	}
+}
 
 
 
@@ -29,9 +68,22 @@ List AdaOpt (std::string method,
 	std::vector<int> Labels;
 	uint dimension = 0;
 	convertData (X, Y, Dataset, Labels, dimension);
+
+	// init probablity 
+	std::vector<double> p;
+	initializeP (p, Dataset, Labels, lambda);
+
+	bool verbose = false;
+	if (verbose == true) {
+		std::cout << "Num examples = " << Labels.size() << std::endl;
+		std::cout << "Num epochs = " << epochs << std::endl;
+		std::cout << "Lambda = " << lambda << std::endl;
+	}
+	
 	
 	// do training
-	std::vector<double> p;
+	// NOTE: in all examples (see main.cc in original code) eta_rule_type is zero with SGDLearn
+	// it just replaces W with a transformed W while computing loss and error.
 	Model mod;
 	WeightVector tmpW(dimension);
 	if (method == "AdaSVRG") {
@@ -52,11 +104,13 @@ List AdaOpt (std::string method,
 		Rf_error ("Unknown method");
 	}
 	
+	// return found weight vector
 	NumericVector W;
 	convertWeightVector (tmpW, W);
 	List z = List::create(Rcpp::Named("W", W));
 	return z ;
 }
+
 
 
 // [[Rcpp::export]]

@@ -11,7 +11,7 @@ using namespace Rcpp;
 
 
 
-List convertData (NumericMatrix X, NumericVector Y, 
+void convertData (NumericMatrix X, NumericVector Y, 
 		std::vector<simple_sparse_vector> &Dataset,
 		std::vector<int> &Labels,
 		uint &dimension)
@@ -43,10 +43,12 @@ List convertData (NumericMatrix X, NumericVector Y,
 			  
 			  
 			  
-List convertWeightVector (WeightVector W, NumericVector intW) {
+void convertWeightVector (WeightVector W, NumericVector intW) {
 }
 
-List convertWeightVector (NumericVector intW, WeightVector W) {
+
+
+void convertWeightVector (NumericVector intW, WeightVector W) {
 }
 
 
