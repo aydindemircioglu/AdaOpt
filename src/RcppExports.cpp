@@ -5,9 +5,9 @@
 
 using namespace Rcpp;
 
-// AdaOpt
-List AdaOpt(std::string method, NumericMatrix X, NumericVector Y, double lambda, uint epochs, bool verbose);
-RcppExport SEXP AdaOpt_AdaOpt(SEXP methodSEXP, SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP epochsSEXP, SEXP verboseSEXP) {
+// AdaOptTrain
+List AdaOptTrain(std::string method, NumericMatrix X, NumericVector Y, double lambda, uint epochs, bool verbose);
+RcppExport SEXP AdaOpt_AdaOptTrain(SEXP methodSEXP, SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP epochsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -17,20 +17,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< uint >::type epochs(epochsSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    __result = Rcpp::wrap(AdaOpt(method, X, Y, lambda, epochs, verbose));
+    __result = Rcpp::wrap(AdaOptTrain(method, X, Y, lambda, epochs, verbose));
     return __result;
 END_RCPP
 }
-// AdaSGDTest
-List AdaSGDTest(NumericMatrix X, NumericVector Y, NumericVector W);
-RcppExport SEXP AdaOpt_AdaSGDTest(SEXP XSEXP, SEXP YSEXP, SEXP WSEXP) {
+// AdaOptTest
+List AdaOptTest(NumericVector W, NumericMatrix X, NumericVector Y);
+RcppExport SEXP AdaOpt_AdaOptTest(SEXP WSEXP, SEXP XSEXP, SEXP YSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type W(WSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type W(WSEXP);
-    __result = Rcpp::wrap(AdaSGDTest(X, Y, W));
+    __result = Rcpp::wrap(AdaOptTest(W, X, Y));
     return __result;
 END_RCPP
 }

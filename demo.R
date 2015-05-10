@@ -41,16 +41,20 @@
 	Y[Y==2]=-1
 	Y[Y==3]=-1
 
-	AdaOpt(method = "AdaSVRG", X, Y)
-	AdaOpt(method = "AdaSDCA", X, Y)
-	AdaOpt(method = "AdaSDCAPlus", X, Y)
-	AdaOpt(method = "AdaGrad", X, Y)
-	AdaOpt(method = "AdaSGD", X, Y)
-	AdaOpt(method = "NonUnifSDCA", X, Y)
-	AdaOpt(method = "NonUnifSGD", X, Y)
+	W = AdaOptTrain (method = "AdaSVRG", X, Y, verbose = TRUE)
+	print(W)
+	T = AdaOptTest (W, X, Y, verbose = TRUE)
+	print(T)
+	
+	AdaOptTrain (method = "AdaSDCA", X, Y)
+	AdaOptTrain (method = "AdaSDCAPlus", X, Y)
+	AdaOptTrain (method = "AdaGrad", X, Y)
+	AdaOptTrain (method = "AdaSGD", X, Y)
+	AdaOptTrain (method = "NonUnifSDCA", X, Y)
+	AdaOptTrain (method = "NonUnifSGD", X, Y)
 	
 	print("OK, Computer")
-	AdaOpt(method = "Unknown", X, Y)
+	AdaOptTrain (method = "Unknown", X, Y)
 
 	
 	

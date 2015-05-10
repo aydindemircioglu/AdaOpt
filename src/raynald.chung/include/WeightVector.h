@@ -28,11 +28,25 @@
 class WeightVector {
   
 public:
+
+	WeightVector() { my_a = 0; my_snorm = 0; my_v = NULL;}; 
+	
 	// FIXME FIXME FIXME!
 	WeightVector(const WeightVector&) { std::cout << "FIXME!!!\n";};// disallowed
   
  public:
 
+	void resize (uint dd) {
+		d = dd;
+		my_a = 1.0;
+		my_snorm = 0.0;
+		delete[] my_v; 
+		my_v = new double[d];
+		for (uint i=0; i<d; ++i) 
+			my_v[i] = 0.0;
+	}
+		
+		
   // Construct a Weight vector with dimension d
   WeightVector(uint dd) : d(dd), my_a(1.0), my_snorm(0.0), my_v(NULL)  {
     my_v = new double[d];

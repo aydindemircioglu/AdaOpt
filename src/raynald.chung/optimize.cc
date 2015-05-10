@@ -5,6 +5,7 @@
 #include "include/optimize.h"
 #include <algorithm>
 
+
 // Help function for getting runtime
 double GetRuntime(void) {
     clock_t start;
@@ -50,7 +51,7 @@ uint BinaryGetSample(const std::vector<double> &s) {
 
 
 // SGD main algorithm
-WeightVector Model::SGDLearn(
+ResultStruct &Model::SGDLearn(
         // Input variables
         std::vector<simple_sparse_vector> Dataset,
         std::vector<int> Labels,
@@ -61,7 +62,8 @@ WeightVector Model::SGDLearn(
         // additional parameters
         int eta_rule_type, 
 		const uint& num_epoch, 
-		const uint &k) {
+		const uint &k,
+		bool verbose) {
 	
     uint num_examples = Labels.size();
 
@@ -99,11 +101,18 @@ WeightVector Model::SGDLearn(
 
         for (uint epoch = 0; epoch < num_epoch; epoch++) {
  
+			if (verbose == true) {
+				std::cout << "Epoch: " << epoch << "\n";
+			}
+			
+			// 0.2 | 0.3 |0.5
+			// -> 0 | 0.2 | 0.5 | 1.0
             sum.clear();
             sum.push_back(0);
-            for (uint i = 1; i <= num_examples; ++i) {
-                sum.push_back(sum[i-1]+prob[i]);
-            }
+			for (uint i = 0; i < num_examples; ++i) {
+				sum.push_back(sum[i]+prob[i]);
+			}
+            
            if (algo == Adaptive || algo == Adaptive2) {
                 std::fill(chiv.begin(), chiv.end(), 0);
                 std::fill(count.begin(), count.end(), 0);
@@ -295,26 +304,34 @@ WeightVector Model::SGDLearn(
 			output[epoch].total_time += epoch_end_time - epoch_start_time;
 		}
 	}
-	return (W);
+	ResultStruct R;
+	return (R);
 }
 
 
 
 // same for SDCA
-void Model::SGDTest (
+TestResultStruct &Model::SGDTest (
 	WeightVector &W,
 	std::vector<simple_sparse_vector> testDataset,
-	std::vector<int> testLabels
-) 
+	std::vector<int> testLabels,
+	bool verbose) 
 {
 	// Calculate test_loss and test_error
 	double test_loss = 0.0;
 	double test_error = 0.0;
 	for (uint i=0; i < testDataset.size(); ++i) {
 		double cur_loss = 1 - testLabels[i] * (W * testDataset[i]);
-		if (cur_loss < 0.0) cur_loss = 0.0;
+		
+		if (cur_loss < 0.0) {
+			cur_loss = 0.0;
+		}
+		
 		test_loss += cur_loss;
-		if (cur_loss >= 1.0) test_error += 1.0;
+		
+		if (cur_loss >= 1.0) {
+			test_error += 1.0;
+		}
 	}
 	
 	if (testDataset.size() != 0) {
@@ -322,16 +339,21 @@ void Model::SGDTest (
 		test_error /= testDataset.size();
 	}
 
-	// return this
-	std::cout << test_loss;
-	std::cout << test_error;
-
-// FIXME	
+	if (verbose == true) {
+		std::cout << "Test loss: " << test_loss << "\n";
+		std::cout << "Test error: " << test_error << "\n";
+	}
+	
+	// return found weight vector
+	TestResultStruct res;
+	res.test_error = test_error;
+	res.test_loss = test_loss;
+	return res;
 }
 
 
 
-WeightVector Model::SDCALearn(
+ResultStruct &Model::SDCALearn(
         // Input variables
         std::vector<simple_sparse_vector> Dataset,
         std::vector<int> Labels,
@@ -562,10 +584,8 @@ WeightVector Model::SDCALearn(
         }
     }
     
-    
-    // W.print(std::cout);
-    Print();
-	return (W);
+    ResultStruct R;
+	return (R);
 }
 
 
