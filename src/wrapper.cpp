@@ -103,7 +103,7 @@ List AdaOptTrain (std::string method,
 	// NOTE: in all examples (see main.cc in original code) eta_rule_type is zero with SGDLearn
 	// it just replaces W with a transformed W while computing loss and error.
 	Model mod;
-	ResultStruct resultStr;
+	ResultStruct *resultStr;
 	if (method == "AdaSVRG") {
 		resultStr = mod.SGDLearn (Dataset, Labels, dimension, lambda, p, VarianceReduction, 0, epochs, 1);
 	} else if (method == "AdaSGD") {
@@ -119,12 +119,14 @@ List AdaOptTrain (std::string method,
 	} else if (method == "AdaGrad") {
 		resultStr = mod.SGDLearn (Dataset, Labels, dimension, lambda, p, AdaGrad, 0, epochs, 1);
 	} else {
-		Rf_error ("Unknown method");
+		stop ("Unknown method");
 	}
+	
+	std::cout << "A\n";
 	
 	// return found weight vector
 	NumericVector W;
-	convertWeightVector (resultStr.W, W);
+	convertWeightVector (resultStr -> W, W);
 	List z = List::create(Rcpp::Named("W", W));
 	return z ;
 }
@@ -134,7 +136,9 @@ List AdaOptTrain (std::string method,
 // [[Rcpp::export]]
 List AdaOptTest(NumericVector W,
 				NumericMatrix X, 
-				NumericVector Y) {
+				NumericVector Y,
+				bool verbose = false
+   			) {
 	// convert R to internal format
 	std::vector<simple_sparse_vector> Dataset;
 	std::vector<int> Labels;
@@ -147,13 +151,16 @@ List AdaOptTest(NumericVector W,
 	
 	// do testing
 	Model mod; 
-	mod.SGDTest (intW, Dataset, Labels);
+	TestResultStruct *res = mod.SGDTest (intW, Dataset, Labels, verbose);
 	
 	// convert back
 	convertWeightVector (intW, W);
 	
 	// return weight
 	List z = List::create(Rcpp::Named("W", W));
+	
+	// clean up
+	delete res;
 	return z ;
 }
 

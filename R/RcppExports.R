@@ -5,7 +5,7 @@ AdaOptTrain <- function(method, X, Y, lambda = 0.0001, epochs = 30L, verbose = F
     .Call('AdaOpt_AdaOptTrain', PACKAGE = 'AdaOpt', method, X, Y, lambda, epochs, verbose)
 }
 
-AdaOptTest <- function(W, X, Y) {
-    .Call('AdaOpt_AdaOptTest', PACKAGE = 'AdaOpt', W, X, Y)
+AdaOptTest <- function(W, X, Y, verbose = FALSE) {
+    .Call('AdaOpt_AdaOptTest', PACKAGE = 'AdaOpt', W, X, Y, verbose)
 }
 

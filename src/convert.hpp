@@ -49,14 +49,23 @@ void convertData (NumericMatrix X, NumericVector Y,
 			  
 void convertWeightVector (WeightVector W, NumericVector &intW) {
 	std::cout << "W -> intW\n";
-	intW = NumericVector ::create();
+	NumericVector tmpW (W.dimension());
+	
+	for (int i = 0; i < tmpW.size(); i++) {
+		tmpW[i] = W[i];
+	}
+
+	intW = tmpW;
 }
 
 
 
 void convertWeightVector (NumericVector intW, WeightVector &W) {
 	std::cout << "intW -> W\n";
-	W = WeightVector(5);
+
+	std::vector<double> tmpV = Rcpp::as< std::vector<double> > (intW);
+	WeightVector tmpW (tmpV);
+	W = tmpW;
 }
 
 

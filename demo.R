@@ -42,8 +42,10 @@
 	Y[Y==3]=-1
 
 	W = AdaOptTrain (method = "AdaSVRG", X, Y, verbose = TRUE)
+	print ("A")
 	print(W)
 	T = AdaOptTest (W, X, Y, verbose = TRUE)
+	print ("A2")
 	print(T)
 	
 	AdaOptTrain (method = "AdaSDCA", X, Y)

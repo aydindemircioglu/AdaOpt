@@ -26,122 +26,122 @@
 
 
 // function from Joachims that measures CPU time
-double get_runtime(void);
+double get_runtime (void);
 
 enum Alg {Plain, Adaptive, Online, AdaGrad, VarianceReduction, Adaptive2, Online2, AdaSDCAp};
 
 // main optimization function
 
 struct ResultStruct {
-	double total_time;
-	double train_time;
-	double calc_obj_time;
-	double norm_value;
-	double loss_value;
-	double zero_one_error;
-	double obj_value;
-	double test_loss;
-	double test_error;
-	WeightVector W;
-	ResultStruct() {
-		total_time = 0;
-		train_time = 0;
-		calc_obj_time = 0;
-		norm_value = 0;
-		loss_value = 0;
-		zero_one_error = 0;
-		obj_value = 0;
-		test_loss = 0;
-		test_error = 0;
-		W.resize(0);
-	}
+    double total_time;
+    double train_time;
+    double calc_obj_time;
+    double norm_value;
+    double loss_value;
+    double zero_one_error;
+    double obj_value;
+    double test_loss;
+    double test_error;
+    WeightVector W;
+    ResultStruct() {
+        total_time = 0;
+        train_time = 0;
+        calc_obj_time = 0;
+        norm_value = 0;
+        loss_value = 0;
+        zero_one_error = 0;
+        obj_value = 0;
+        test_loss = 0;
+        test_error = 0;
+        W.resize (0);
+    }
 };
 
 
 
 struct TestResultStruct {
-	std::vector<uint> predictions;
-	double test_loss;
-	double test_error;
-	TestResultStruct() {
-		test_loss = 0;
-		test_error = 0;
-		predictions.clear();
-	}
+    std::vector<uint> predictions;
+    double test_loss;
+    double test_error;
+    TestResultStruct() {
+        test_loss = 0;
+        test_error = 0;
+        predictions.clear();
+    }
 };
 
 
 
 class Model {
-public:
-	 
-     uint num_examples;
-     std::vector<double> chiv;
-     std::vector<double> count;
-     std::vector<double> precompute;
-     std::vector<double> alpha;
-     std::vector<ResultStruct> output;
-     //For online algorithm
-     std::vector<std::deque<double> > recent;
+    public:
 
-	 
-	 
- public:
+        uint num_examples;
+        std::vector<double> chiv;
+        std::vector<double> count;
+        std::vector<double> precompute;
+        std::vector<double> alpha;
+        std::vector<ResultStruct> output;
+        //For online algorithm
+        std::vector<std::deque<double> > recent;
 
-     // Main optimization function for SGD
-	 ResultStruct  &SGDLearn(
-             // Input variables
-             std::vector<simple_sparse_vector> Dataset,
-             std::vector<int> Labels,
-             uint dimension,
-             double lambda,
-             std::vector<double> p, 
-             Alg algo,
-             // Additional parameters
-             int eta_rule_type, 
-			 // const uint &num_round, 
-			 const uint &num_epoch, 
-			 const uint &k,
-			 bool verbose = false);
-		 
-	 
-	 TestResultStruct &SGDTest (
-		 WeightVector &W,
-		 std::vector<simple_sparse_vector> testDataset,
-		 std::vector<int> testLabels,
-		 bool verbose = false) ;
 
-		 
-	 
-     // Main optimization function for SDCA
-		 ResultStruct &SDCALearn(
-             // Input variables
-             std::vector<simple_sparse_vector> Dataset,
-             std::vector<int> Labels,
-             uint dimension,
-             double lambda,
-             std::vector<double> p,
-             Alg algo,
-             // Additional parameters
-             //const uint &num_round, 
-			 const uint &num_epoch, const uint &k);
-    
-	 
-	 
-     // Print result
-     void Print();
 
-	 
-	 
-     // Function for reading the data
-     void ReadData(
-             // Input
-             std::string& data_filename,
-             // Output
-             std::vector<simple_sparse_vector> & Dataset,
-             std::vector<int> & Labels,
-             uint& dimension,
-             double& readingTime);
+    public:
+
+        // Main optimization function for SGD
+        ResultStruct  *SGDLearn (
+            // Input variables
+            std::vector<simple_sparse_vector> Dataset,
+            std::vector<int> Labels,
+            uint dimension,
+            double lambda,
+            std::vector<double> p,
+            Alg algo,
+            // Additional parameters
+            int eta_rule_type,
+            // const uint &num_round,
+            const uint &num_epoch,
+            const uint &k,
+            bool verbose = false);
+
+
+        TestResultStruct *SGDTest (
+            WeightVector &W,
+            std::vector<simple_sparse_vector> testDataset,
+            std::vector<int> testLabels,
+            bool verbose = false) ;
+
+
+
+        // Main optimization function for SDCA
+        ResultStruct *SDCALearn (
+            // Input variables
+            std::vector<simple_sparse_vector> Dataset,
+            std::vector<int> Labels,
+            uint dimension,
+            double lambda,
+            std::vector<double> p,
+            Alg algo,
+            // Additional parameters
+            //const uint &num_round,
+            const uint &num_epoch, const uint &k);
+
+
+
+        // Print result
+        void Print();
+
+
+
+        // Function for reading the data
+        void ReadData (
+            // Input
+            std::string& data_filename,
+            // Output
+            std::vector<simple_sparse_vector> & Dataset,
+            std::vector<int> & Labels,
+            uint& dimension,
+            double& readingTime);
 };
 
 #endif  // INCLUDE_OPTIMIZE_H_

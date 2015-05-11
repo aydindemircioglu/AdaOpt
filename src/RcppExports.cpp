@@ -22,15 +22,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // AdaOptTest
-List AdaOptTest(NumericVector W, NumericMatrix X, NumericVector Y);
-RcppExport SEXP AdaOpt_AdaOptTest(SEXP WSEXP, SEXP XSEXP, SEXP YSEXP) {
+List AdaOptTest(NumericVector W, NumericMatrix X, NumericVector Y, bool verbose);
+RcppExport SEXP AdaOpt_AdaOptTest(SEXP WSEXP, SEXP XSEXP, SEXP YSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericVector >::type W(WSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Y(YSEXP);
-    __result = Rcpp::wrap(AdaOptTest(W, X, Y));
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    __result = Rcpp::wrap(AdaOptTest(W, X, Y, verbose));
     return __result;
 END_RCPP
 }

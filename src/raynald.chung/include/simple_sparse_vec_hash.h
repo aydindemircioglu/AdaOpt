@@ -25,11 +25,11 @@
 typedef unsigned int uint;
 
 class IndexValuePair {
- public:
-  IndexValuePair() { }
-  IndexValuePair(uint i, double v) : first(i), second(v) { }
-  uint first;
-  double second;
+    public:
+        IndexValuePair() { }
+        IndexValuePair (uint i, double v) : first (i), second (v) { }
+        uint first;
+        double second;
 };
 
 typedef std::vector<IndexValuePair>::iterator simple_sparse_vector_iterator;
@@ -39,46 +39,46 @@ typedef std::vector<IndexValuePair>::iterator simple_sparse_vector_iterator;
     @author Shai Shalev-Shwartz (shais@cs.huji.ac.il)
 */
 class simple_sparse_vector {
- public:
-  /** Default Constructor. Allocates an all zeros sparse vector
-  */
-  simple_sparse_vector() {  }
+    public:
+        /** Default Constructor. Allocates an all zeros sparse vector
+        */
+        simple_sparse_vector() {  }
 
-  /** Constructor. Read a line from a file of pairs of string and value.
-      Construct a vector from this line.
-      @param is The input stream to read from.
-  */
-  explicit simple_sparse_vector(std::istream& is);
+        /** Constructor. Read a line from a file of pairs of string and value.
+            Construct a vector from this line.
+            @param is The input stream to read from.
+        */
+        explicit simple_sparse_vector (std::istream& is);
 
-  /** Constructor. Construct a vector from an istringstream.
-      @param is The input stringstream to read from.
-      @param n The number of elements to read
-  */
-  simple_sparse_vector(std::istringstream& is, int n);
+        /** Constructor. Construct a vector from an istringstream.
+            @param is The input stringstream to read from.
+            @param n The number of elements to read
+        */
+        simple_sparse_vector (std::istringstream& is, int n);
 
-  // Multiply a sparse vector by a scalar s
-  void scale(double s);
+        // Multiply a sparse vector by a scalar s
+        void scale (double s);
 
-  /** Returns the squared l_2 norm of the vector
-      @return the squared l_2 norm of the vector
-  */
-  double snorm();
+        /** Returns the squared l_2 norm of the vector
+            @return the squared l_2 norm of the vector
+        */
+        double snorm();
 
-  /** Convert the vector to a binary vector that just indicates 
-      which elements are non-zero
-  */
-  void make_binary();
+        /** Convert the vector to a binary vector that just indicates
+            which elements are non-zero
+        */
+        void make_binary();
 
-  // return the maximal non-zero index
-  uint max_index();
+        // return the maximal non-zero index
+        uint max_index();
 
-  // Print the content of a sparse instance to an output stream
-  void print(std::ostream& os);
+        // Print the content of a sparse instance to an output stream
+        void print (std::ostream& os);
 
-  // Zero all indexed elements of a sparse vector
-  void zero();
+        // Zero all indexed elements of a sparse vector
+        void zero();
 
-  std::vector<IndexValuePair> my_vec;
+        std::vector<IndexValuePair> my_vec;
 };
 
 
@@ -91,56 +91,56 @@ typedef std::vector< std::vector<IndexValuePair> >::iterator simple_hash_table_i
     @author Shai Shalev-Shwartz (shais@cs.huji.ac.il)
 */
 class simple_hash_table {
- public:
-  /** Default Constructor. Allocates an all zeros hash table
-  */
-  simple_hash_table() : my_vec(1087) {  }
+    public:
+        /** Default Constructor. Allocates an all zeros hash table
+        */
+        simple_hash_table() : my_vec (1087) {  }
 
-  /** Constructor. Allocates an all zeros hash table with m entries
-  */
-  explicit simple_hash_table(uint m) : my_vec(m) {  }
-
-
-  /** retreive the value of the i'th element of the hash
-      @param i the index to retrieve
-  */
-  double get(uint i);
-
-  /** reference operator. Retrieves the i'th element of the hash and
-      create it if it doesn't exist.
-      @param i the index to retrieve
-  */
-  double& get_ref(uint i);
-
-  // Multiply a sparse vector by a scalar s
-  void scale(double s);
-
-  // this = a * this + b * other;
-  void scale_and_add(simple_sparse_vector& other, double a, double b);
-
-  // this = a * this + b * other;
-  void scale_and_add(simple_hash_table& other, double a, double b);
-
-  // this += b*other;
-  void add(simple_hash_table& other, double b);
-
-  // this += b*other;
-  void add(simple_sparse_vector& other, double b);
+        /** Constructor. Allocates an all zeros hash table with m entries
+        */
+        explicit simple_hash_table (uint m) : my_vec (m) {  }
 
 
-  /** Returns the squared l_2 norm of the vector
-      @return the squared l_2 norm of the vector
-  */
-  double snorm();
+        /** retreive the value of the i'th element of the hash
+            @param i the index to retrieve
+        */
+        double get (uint i);
 
-  // Print the content of a sparse instance to an output stream
-  void print(std::ostream& os);
+        /** reference operator. Retrieves the i'th element of the hash and
+            create it if it doesn't exist.
+            @param i the index to retrieve
+        */
+        double& get_ref (uint i);
 
-  // Zero all indexed elements of a sparse vector
-  void zero();
+        // Multiply a sparse vector by a scalar s
+        void scale (double s);
+
+        // this = a * this + b * other;
+        void scale_and_add (simple_sparse_vector& other, double a, double b);
+
+        // this = a * this + b * other;
+        void scale_and_add (simple_hash_table& other, double a, double b);
+
+        // this += b*other;
+        void add (simple_hash_table& other, double b);
+
+        // this += b*other;
+        void add (simple_sparse_vector& other, double b);
 
 
-  std::vector< std::vector<IndexValuePair> > my_vec;
+        /** Returns the squared l_2 norm of the vector
+            @return the squared l_2 norm of the vector
+        */
+        double snorm();
+
+        // Print the content of a sparse instance to an output stream
+        void print (std::ostream& os);
+
+        // Zero all indexed elements of a sparse vector
+        void zero();
+
+
+        std::vector< std::vector<IndexValuePair> > my_vec;
 
 };
 
