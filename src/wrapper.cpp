@@ -29,9 +29,10 @@ void initializeP (std::vector<double> &p,
 	uint num_examples = Labels.size();
 	
 	// for adaptive sampling
-//	p.push_back(1); //??
-	for (uint i = 0; i < num_examples; ++i) {
-		p.push_back(sqrt(Dataset[i].snorm()) + sqrt(lambda));
+	// NOTE: the original code has here an index error. not sure, if this now is correct.
+	p.push_back(1);
+	for (uint i = 1; i <= num_examples; ++i) {
+		p.push_back(sqrt(Dataset[i-1].snorm()) + sqrt(lambda));
 		sumup += p[i];
 	}
 	
@@ -81,6 +82,9 @@ List AdaOptTrain (std::string method,
 	if (verbose == true) {
 		Rcout << "Feature dimension is " << dimension << "\n";
 	}
+	
+	// but somehow we work with one dimension more
+	dimension = dimension + 1;
 /*	
 	for (int i = 0; i < Dataset.size(); i++) {
 		Rcout << Y(i) << " ";
@@ -121,8 +125,6 @@ List AdaOptTrain (std::string method,
 	} else {
 		stop ("Unknown method");
 	}
-	
-	std::cout << "A\n";
 	
 	// return found weight vector
 	NumericVector W;

@@ -111,10 +111,9 @@ ResultStruct *Model::SGDLearn (
     prob = p;
     t = 0;
 
+	//std::cout << "OO\n";
+	
     for (uint epoch = 0; epoch < num_epoch; epoch++) {
-
-        verbose = true;
-
         if (verbose == true) {
             std::cout << "Epoch: " << epoch << "\n";
         }
@@ -124,24 +123,21 @@ ResultStruct *Model::SGDLearn (
         sum.clear();
         sum.push_back (0);
 
-        for (uint i = 0; i < num_examples; ++i) {
-            sum.push_back (sum[i] + prob[i]);
+        for (uint i = 1; i <= num_examples; ++i) {
+            sum.push_back (sum[i - 1] + prob[i]);
         }
 
-        std::cout << "V\n";
 
         if (algo == Adaptive || algo == Adaptive2) {
             std::fill (chiv.begin(), chiv.end(), 0);
             std::fill (count.begin(), count.end(), 0);
         }
 
-        std::cout << "G\n";
-
+        
         if (algo == VarianceReduction && epoch > 0) {
             rW = W;
             C.scale (0);
-            std::cout << "A\n";
-
+        
             for (uint i = 0; i < num_examples; ++i) {
                 precompute[i] = W * Dataset[i];
                 double loss = std::max (0.0, 1.0 - Labels[i] * precompute[i]);
@@ -151,12 +147,9 @@ ResultStruct *Model::SGDLearn (
                 }
             }
 
-            std::cout << "L\n";
             C.scale (1.0 / num_examples);
             C.add (W, lambda);
         }
-
-        std::cout << "F\n";
 
         double epoch_start_time = GetRuntime();
         double train_startTime = GetRuntime();
@@ -168,8 +161,6 @@ ResultStruct *Model::SGDLearn (
         double cur_loss;
 
         for (uint i = 0; i < num_examples; ++i) {
-            std::cout << "K\n";
-
             ++t;
 
             if (eta_rule_type == 0) {
@@ -278,8 +269,6 @@ ResultStruct *Model::SGDLearn (
             }
         }
 
-        std::cout << "W\n";
-
         // update timeline
         double train_endTime = GetRuntime() - sample_time;
         double train_time = train_endTime - train_startTime;
@@ -317,10 +306,8 @@ ResultStruct *Model::SGDLearn (
         output[epoch].loss_value += loss_value;
         output[epoch].zero_one_error += zero_one_error;
         output[epoch].obj_value += obj_value;
-        std::cout << "2Y\n";
 
         if (algo == Adaptive) {
-            std::cout << "U\n";
             double sumup = 0;
             double comeup = 0;
 
@@ -340,16 +327,12 @@ ResultStruct *Model::SGDLearn (
             }
 
             for (uint j = 0; j < num_examples; ++j) {
-                std::cout << "Y2\n";
-
                 if (prob[j] > 0) {
                     sumup += prob[j];
                 } else {
                     comeup ++;
                 }
             }
-
-            std::cout << "U\n";
 
             for (uint j = 0; j < num_examples; ++j) {
                 if (prob[j] > 0) {
@@ -361,7 +344,6 @@ ResultStruct *Model::SGDLearn (
 
             prob[0] = 1;
         } else if (algo == Adaptive2) {
-            std::cout << "M\n";
             prob[0] = 0;
 
             for (uint j = 0; j < num_examples - 1; ++j) {
@@ -371,23 +353,20 @@ ResultStruct *Model::SGDLearn (
                 prob[0] += prob[j + 1];
             }
         }
-
-        std::cout << "T\n";
+        
         double epoch_end_time = GetRuntime();
         output[epoch].total_time += epoch_end_time - epoch_start_time;
-        std::cout << "Q\n";
     }
 
-    std::cout << "X\n";
     ResultStruct *R = new ResultStruct;
     R -> W = W;
-	
+/*	
 	for (uint i = 0; i < W.dimension(); i++) {
 		std::cout << W[i] << ".\n";
 	}
-	
-    std::cout << "X\n";
-    return (R);
+	*/
+
+	return (R);
 }
 
 
@@ -457,7 +436,13 @@ ResultStruct *Model::SDCALearn (
     WeightVector W (dimension);
     int m = 2;
 
-    output.resize (num_epoch);
+	
+	chiv.resize (num_examples);
+	alpha.resize (num_examples);
+	precompute.resize (num_examples);
+	count.resize (num_examples);
+	
+	output.resize (num_epoch);
 
     for (std::vector<ResultStruct>::iterator out = output.begin(); out != output.end(); out++) {
         out->total_time = 0;

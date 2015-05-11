@@ -75,7 +75,6 @@ class WeightVector {
 			for (uint i = 0; i < d; ++i) {
 				my_v[i] = tmpV[i];
 				my_snorm += my_v[i] * my_v[i];
-				std::cout << (my_v[i]) << "..\n";
 			}
 		}
 
